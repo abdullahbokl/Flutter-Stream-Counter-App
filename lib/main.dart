@@ -17,17 +17,6 @@ class _CounterScreenState extends State<CounterScreen> {
   int _counter = 0;
 
   @override
-  void initState() {
-    super.initState();
-    // Listen to the stream and update the counter when it changes.
-    _counterStreamController.stream.listen((newCount) {
-      setState(() {
-        _counter = newCount;
-      });
-    });
-  }
-
-  @override
   void dispose() {
     // Close the stream when the widget is disposed.
     _counterStreamController.close();
@@ -36,7 +25,8 @@ class _CounterScreenState extends State<CounterScreen> {
 
   void _incrementCounter() {
     // Increment the counter and add it to the stream.
-    _counterStreamController.add(_counter + 1);
+    _counter++;
+    _counterStreamController.add(_counter);
   }
 
   @override
@@ -46,7 +36,16 @@ class _CounterScreenState extends State<CounterScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Counter: $_counter', style: const TextStyle(fontSize: 30)),
+            StreamBuilder(
+              initialData: _counter,
+              stream: _counterStreamController.stream,
+              builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+                return Text(
+                  'Counter: ${snapshot.data}', // Use the snapshot
+                  style: const TextStyle(fontSize: 30),
+                );
+              },
+            ),
             ElevatedButton(
               onPressed: _incrementCounter,
               child: const Text('Add'),
